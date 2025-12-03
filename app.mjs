@@ -11,9 +11,9 @@ await page.goto("https://quotes.toscrape.com/js/");
 async function nextPage() {
   await page.waitForSelector(".quote");
 
-  const quoteElements = await page.$$(".quote");
+  const allQuotes = await page.$$(".quote");
 
-  const quotePromises = quoteElements.map(async (quote) => {
+  const readyQuotes = allQuotes.map(async (quote) => {
     const text = await quote.$eval(".text", (el) => el.innerText);
     const author = await quote.$eval(".author", (el) => el.innerText);
     const tags = await quote.$$eval(".tag", (els) =>
@@ -23,7 +23,7 @@ async function nextPage() {
     return { text, author, tags };
   });
 
-  const quotes = await Promise.all(quotePromises);
+  const quotes = await Promise.all(readyQuotes);
 
   console.log(quotes);
 
@@ -31,7 +31,6 @@ async function nextPage() {
 
   if (nextButton) {
     await Promise.all([page.waitForNavigation(), nextButton.click()]);
-
     await nextPage();
   }
 }
